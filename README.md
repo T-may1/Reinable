@@ -1,4 +1,4 @@
-#reinable
+# reinable
 
 App description
 
@@ -9,4 +9,4 @@ Version 0.1.0 has one horse profile with imput fields for information about the 
 Version 1.0.0 Will allow the user to add multiple horse profiles and switch between them
 
 
-##Developer information
+## Developer information
