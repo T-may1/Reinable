@@ -12,4 +12,5 @@ Version 2.0.0 Will allow the user to add multiple horse profiles and switch betw
 ## Developer information
 
 To start frontend execute :
+
   npm run serve
