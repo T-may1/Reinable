@@ -12,9 +12,6 @@
      <div>
         <Header horseName="Namaqua" action="More Info"/>
     </div>
-     <div>
-        <Header horseName="Miss Legal" action="More Info"/>
-    </div>
      
     <div>
         <Profile horseProfile="Herd Memeber 1"/>
