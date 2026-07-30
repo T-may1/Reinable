@@ -7,6 +7,8 @@ Reinable is a Vue.js app to manage and track and store information on individual
 
 ## Developer information
 
-To start frontend execute :
+To serve frontend from backend execute :
 
-    npm run serve
+    npm run start
+
+app runs on port 3000
