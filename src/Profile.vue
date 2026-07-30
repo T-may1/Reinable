@@ -61,21 +61,53 @@ export default {
     data() {
         return{
             image: image,
-            name: "Heidi",
-            role: "Lead Mare",
-            schooling:"Level 4",
-            height: "14.2h",
-            weight: "350kg",
+            name: "",
+            role: "",
+            schooling:"",
+            height: "",
+            weight: "",
             isEditMode: false
         }
        
     },
+    async created() {
+        const profileData = await this.fetchProfileData()
+        this.name = profileData.name
+        this.role = profileData.role
+        this.schooling = profileData.schooling
+        this.height = profileData.height
+        this.weight = profileData.weight
+    },
     methods: {
         handleEditProfile() {
-                this.isEditMode = true
+            this.isEditMode = true
             },
-        handleUpdateProfile() {
+        async handleUpdateProfile() {
+            const payload = {
+                name: this.name,
+                role: this.role,
+                shcooling: this.schooling,
+                height: this.height,
+                weight: this.weight
+            }
+            const resJson = await this.updateProfileData(payload)
+            console.log(resJson)
             this.isEditMode = false
+        },
+        async fetchProfileData() {
+            const res = await fetch('get-profile')
+            return await res.json()
+        },
+        async updateProfileData(payload) {
+            const res = await fetch('update-profile', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            return await res.json()
         }
     },
     props: {
