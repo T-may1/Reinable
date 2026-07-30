@@ -55,17 +55,17 @@
 </template>
 
 <script>
-import image from './heidi.jpeg'
+import image from './candor.jpeg'
 export default {
-    name: 'Profile',
+    name: 'Profile2',
     data() {
         return{
             image: image,
-            name: "Heidi",
-            role: "Lead Mare",
-            schooling:"Level 4",
-            height: "14.2h",
-            weight: "350kg",
+            name: "Candor",
+            role: "Lead Stallion",
+            schooling:"Basic",
+            height: "15h",
+            weight: "380kg",
             isEditMode: false
         }
        
@@ -79,7 +79,7 @@ export default {
         }
     },
     props: {
-        horseName: String
+        horseProfile: String
     }
         
     

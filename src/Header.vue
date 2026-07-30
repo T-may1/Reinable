@@ -1,8 +1,8 @@
 <template>
 
     <header v-show="headerview" class="name-header-container">
-        <h1 class="name-header">{{ horseName }}</h1>
-        <button>{{ action }}</button>
+        <h1 class="name-header">{{ horseProfile }}</h1>
+        <button @click="handleClick" >{{ buttonText }}</button>
     </header>
 
 
@@ -14,15 +14,25 @@ export default {
     name: 'Header',
     data() {
         return {
-            headerview: true
+            headerview: true,
+            isToggled: false
         }
     },
+    computed: {
+        buttonText() {
+            return this.isToggled ? 'Hide Info' : 'More Info'
+    }
+    },
     props: {
-        horseName: String,
-        action: String,
+        horseProfile: String,
     },
     methods: {
+        handleClick() {
+            this.$emit('toggle-view')
+            this.isToggled = !this.isToggled
 
+        },
+        
     }
 }
 
