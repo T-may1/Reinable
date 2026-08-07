@@ -1,5 +1,5 @@
 <template>
-    <div v-show="!isEditMode">
+    <div class="profile-container" v-show="!isEditMode">
         <div class="heading-container">
             <h1>{{ horseName }}</h1>
             <img :src="image">
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div v-show="isEditMode">
+    <div class="profile-container" v-show="isEditMode">
         <div class="heading-container">
             <h1>{{horseProfile}}</h1>
             <img :src="image">
@@ -70,45 +70,15 @@ export default {
         }
        
     },
-    async created() {
-        const profileData = await this.fetchProfileData()
-        this.name = profileData.name
-        this.role = profileData.role
-        this.schooling = profileData.schooling
-        this.height = profileData.height
-        this.weight = profileData.weight
-    },
+    
     methods: {
         handleEditProfile() {
             this.isEditMode = true
             },
-        async handleUpdateProfile() {
-            const payload = {
-                name: this.name,
-                role: this.role,
-                shcooling: this.schooling,
-                height: this.height,
-                weight: this.weight
-            }
-            const resJson = await this.updateProfileData(payload)
-            console.log(resJson)
+        handleUpdateProfile() {
             this.isEditMode = false
-        },
-        async fetchProfileData() {
-            const res = await fetch('get-profile')
-            return await res.json()
-        },
-        async updateProfileData(payload) {
-            const res = await fetch('update-profile', {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            return await res.json()
         }
+        
     },
     props: {
         horseName: String
@@ -129,15 +99,24 @@ img {
     margin-bottom: 40px;
 }
 
+.profile-container {
+    background-color: white;
+    width: 60%;
+    margin: 10px auto;
+}
+
 .heading-container {
     margin-bottom: 5px;
     text-align:center;
+    width: 60%;
+    margin: auto;
 
 }
 .info-container {
    
     width: 40%;
     margin: auto;
+
 }
 
 hr {
@@ -159,6 +138,13 @@ b {
 span {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 15px;
+}
+
+#update-button {
+    margin-bottom: 20px;
+}
+#edit-button {
+    margin-bottom: 20px;
 }
 
 </style>

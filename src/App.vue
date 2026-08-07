@@ -1,54 +1,43 @@
 <template> 
-    <div class="main-header container">
-        <div class="header-container">
-            <Header @toggle-view="toggleViewHeidi" horseProfile="Herd member 1"/>
+    <div id="main-container">
+        <div>
+            <Header/>
         </div>
-        <div class="header-container">
-            <Header @toggle-view="toggleViewCandor" horseProfile="Herd member 2"/>
+        <div>
+            <NavBar/>
         </div>
-        <div class="header-container">
-            <Header @toggle-view="toggleViewDelavie" horseProfile="Herd member 3"/>
+        <div >
+            <ProfileHeader @toggle-view="toggleViewHeidi" horseProfile="Herd member 1"/>
         </div>
-        <div class="header-container" >
-            <Header horseProfile="Herd member 4" action="More Info"/>
-        </div>
-
-         <div class="header-container" >
-            <Header horseProfile="Herd member 5" action="More Info"/>
-        </div>
-        
         <div v-show="showViewHeidi">
             <Profile horseName="Heidi"/>
         </div>
-
-        <div v-show="showViewCandor">
-            <Profile2 horseName="Candor"/>
-        </div>
-
-        <div v-show="showViewDelavie">
-            <Profile3 horseName="Delavie"/>
+        <div>
+            <Footer/>
         </div>
     </div>
 
 </template>
 
 <script>
-import Header from './Header.vue'
+import Footer from './Footer.vue'
+import ProfileHeader from './ProfileHeader.vue'
+import NavBar from './NavBar.vue'
 import Profile from './Profile.vue'
-import Profile2 from './Profile2.vue'
-import Profile3 from './Profile3.vue'
+import Header from './Header.vue'
 
 export default {
     name: 'App',
     components: {
-        Header,
+        ProfileHeader,
         Profile,
-        Profile2,
-        Profile3
+        NavBar,
+        Footer,
+        Header
     },
     data () {
         return {
-            showViewHeidi: false,
+            showViewHeidi: true,
             showViewCandor: false,
             showViewDelavie: false
         }
@@ -70,19 +59,20 @@ export default {
 </script>
 
 <style>
-#app {
-    margin: auto;
-    margin-bottom: 100px;
-   
-}
-.header-container {
-    width: auto;
-    display: inline-flex;
-    margin: 50px;
-}
-.main-header-container {
-    flex: 1;
-    min-width: 200px;
+#main-container {
+    background-color: aliceblue;
 }
 
+
+body {
+    margin: 0;
+}
+
+h1 {
+    margin: 0;
+}
+
+
 </style>
+
+

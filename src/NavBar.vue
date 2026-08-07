@@ -1,6 +1,6 @@
 <template>
-    <div class="header-container">
-       <h1>Header</h1>
+    <div class="nav-container">
+       <h1>Navigation</h1>
     </div>
 
 
@@ -9,7 +9,7 @@
 <script>
 
 export default {
-    name: 'Header',
+    name: 'NavBar',
 
 }
 
@@ -18,13 +18,12 @@ export default {
 <style>
 
 
-.header-container {
+.nav-container {
     text-align: center;
-    background-color: rgb(51, 50, 50);
+    background-color: darkgray;
     font-family:fantasy;
     color: gray;
     font-size: 20px;
-    margin: 0;
 
 }
 
