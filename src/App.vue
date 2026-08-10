@@ -37,20 +37,12 @@ export default {
     },
     data () {
         return {
-            showViewHeidi: true,
-            showViewCandor: false,
-            showViewDelavie: false
+            showViewHeidi: true
         }
     },
     methods:{
         toggleViewHeidi() {
             this.showViewHeidi = !this.showViewHeidi
-        },
-        toggleViewCandor() {
-            this.showViewCandor = !this.showViewCandor
-        },
-        toggleViewDelavie() {
-            this.showViewDelavie = !this.showViewDelavie
         }
     }
 
@@ -60,11 +52,14 @@ export default {
 
 <style>
 #main-container {
-    background-color: aliceblue;
+    background-color: rgb(214, 214, 214);
 }
 
 
 body {
+    margin: 0;
+}
+html {
     margin: 0;
 }
 

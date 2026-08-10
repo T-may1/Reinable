@@ -49,8 +49,9 @@ export default {
     font-family:fantasy;
     color: gray;
     font-size: 20px;
-    width: 60%;
+    width: 50%;
     margin: auto;
+    margin-top: 50px;
 }
 
 button {

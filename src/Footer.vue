@@ -20,7 +20,7 @@ export default {
 <style>
 
 .footer-container {
-    background-color: aliceblue;
+    background-color: rgb(214, 214, 214);
     font-family:fantasy;
     color: gray;
     font-size: 20px;

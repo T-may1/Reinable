@@ -101,14 +101,14 @@ img {
 
 .profile-container {
     background-color: white;
-    width: 60%;
+    width: 50%;
     margin: 10px auto;
 }
 
 .heading-container {
     margin-bottom: 5px;
     text-align:center;
-    width: 60%;
+    width: 50%;
     margin: auto;
 
 }

@@ -1,6 +1,6 @@
 <template>
     <div class="header-container">
-       <h1>Header</h1>
+       <h1 id="header">Welcome to the Ranch</h1>
     </div>
 
 
@@ -17,14 +17,21 @@ export default {
 
 <style>
 
+#header {
+    text-align: center;
+    margin: 20px;
+}
 
 .header-container {
+    display: flex;
+    justify-content: center;
     text-align: center;
-    background-color: rgb(51, 50, 50);
+    background-color: white;
     font-family:fantasy;
-    color: gray;
+    color: rgb(20, 20, 20);
     font-size: 20px;
     margin: 0;
+    height: 100px;
 
 }
 
