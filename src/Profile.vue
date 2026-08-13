@@ -36,7 +36,7 @@
                 <input id="input-role" v-model="role" type="text" />
                 <hr>
                 <span>Schooling: </span> 
-                <input id="input-svhooling" v-model="schooling" type="text" />
+                <input id="input-schooling" v-model="schooling" type="text" />
                 <hr>
                 <span>Height: </span> 
                 <input id="input-height" v-model="height" type="text" />
@@ -86,7 +86,7 @@ export default {
             const payload = {
                 name: this.name,
                 role: this.role,
-                shcooling: this.schooling,
+                schooling: this.schooling,
                 height: this.height,
                 weight: this.weight
             }
