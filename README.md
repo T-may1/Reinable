@@ -12,3 +12,6 @@ To serve frontend from backend execute :
     npm run start
 
 app runs on port 3000
+
+
+This branch contains the initial code with multiple profiles
