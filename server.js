@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require ('body-parser')
 const { MongoClient } = require('mongodb')
+const { isEmptyPayload, isInvalidHeight} = require('./validator')
 
 const url = 'mongodb://localhost:27017'
 const client = new MongoClient(url)
@@ -13,8 +14,6 @@ app.use(bodyParser.json())
 app.use('/', express.static(__dirname + '/dist'))
 
 app.get('/get-profile', async function(req, res) {
-    
-
     // connect to db
     await client.connect()
     console.log('Successfully connected to database')
@@ -49,8 +48,8 @@ app.post('/update-profile', async function(req, res) {
     const payload = req.body
     console.log(payload)
 
-    if (Object.keys(payload).length === 0) {
-        res.status(400).send({error: "empty payload.Couldn't update data"})
+    if (isEmptyPayload(payload) || isInvalidHeight(payload)) {
+        res.status(400).send({error: "invalid payload.Couldn't update data"})
     } else {
         //connect to mongodb 
         await client.connect()
@@ -73,3 +72,8 @@ app.post('/update-profile', async function(req, res) {
 const server = app.listen(3000, function(){
     console.log("app listening on port 3000")
 })
+
+module.exports = {
+    app,
+    server
+}
