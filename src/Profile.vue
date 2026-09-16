@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import image from './heidi.jpeg'
+import image from './heidi.png'
 export default {
     name: 'Profile',
     data() {
@@ -123,8 +123,8 @@ export default {
 
 <style>
 img {
-    width: 320px;
-    height: 270px;
+    max-width: 350px;
+    width: 100%;
     object-fit: contain;
     display:block;
     margin: auto;
@@ -132,21 +132,28 @@ img {
 }
 
 .profile-container {
-    background-color: white;
-    width: 50%;
-    margin: 10px auto;
+    background-color:rgb(123, 155, 116);
+    width: 70%;
+    margin: auto;
+    margin-top: 30px;
+    border-radius: 10px;
 }
 
 .heading-container {
     margin-bottom: 5px;
     text-align:center;
-    width: 50%;
+    width: 70%;
     margin: auto;
 
 }
+
+.heading-container h1{
+    padding: 10px
+}
+
 .info-container {
    
-    width: 40%;
+    width: 70%;
     margin: auto;
 
 }
@@ -160,6 +167,9 @@ input {
     width: 50%;
     font-size: 15px;
     padding: 10px;
+    border-radius: 5px;
+    background-color: rgb(245, 243, 243);
+    border: none;
 }
 
 b {
@@ -177,6 +187,16 @@ span {
 }
 #edit-button {
     margin-bottom: 20px;
+}
+
+button{
+    background-color:rgb(32, 32, 32);
+    color: rgb(93, 138, 83);
+}
+
+button:hover{
+    cursor: pointer;
+    transition: all .3s ease;
 }
 
 </style>

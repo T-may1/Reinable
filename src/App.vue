@@ -6,14 +6,8 @@
         <div>
             <NavBar/>
         </div>
-        <div >
-            <ProfileHeader @toggle-view="toggleViewHeidi" horseProfile="Herd member 1"/>
-        </div>
         <div v-show="showViewHeidi">
             <Profile horseName="Heidi"/>
-        </div>
-        <div>
-            <Footer/>
         </div>
     </div>
 
@@ -29,10 +23,8 @@ import Header from './Header.vue'
 export default {
     name: 'App',
     components: {
-        ProfileHeader,
         Profile,
         NavBar,
-        Footer,
         Header
     },
     data () {
@@ -52,21 +44,15 @@ export default {
 
 <style>
 #main-container {
-    background-color: rgb(214, 214, 214);
-}
-
-
-body {
-    margin: 0;
-}
-html {
+    background-color:rgb(200, 214, 194);
     margin: 0;
 }
 
-h1 {
+*{
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-
 
 </style>
 

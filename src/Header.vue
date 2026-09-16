@@ -26,9 +26,9 @@ export default {
     display: flex;
     justify-content: center;
     text-align: center;
-    background-color: white;
+    background-color: rgb(147, 158, 143);;
     font-family:fantasy;
-    color: rgb(20, 20, 20);
+    color: #000000;
     font-size: 20px;
     margin: 0;
     height: 100px;
