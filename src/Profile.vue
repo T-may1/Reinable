@@ -133,7 +133,7 @@ img {
 
 .profile-container {
     background-color:rgb(123, 155, 116);
-    width: 70%;
+    width: 50%;
     margin: auto;
     margin-top: 30px;
     border-radius: 10px;
