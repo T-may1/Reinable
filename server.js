@@ -3,11 +3,17 @@ const app = express()
 const bodyParser = require ('body-parser')
 const { MongoClient } = require('mongodb')
 const { isEmptyPayload, isInvalidHeight} = require('./validator')
+const dbAdress = '127.0.0.1:27017'
 
-const url = 'mongodb://localhost:27017'
+const { DB_USER, DB_PASS, DEV} = process.env
+
+const url = DEV?`mongodb://${dbAdress}` : `mongodb://${DB_USER}:${DB_PASS}@dbAdress?authSource=ranch_db`
+
+
 const client = new MongoClient(url)
 const dbName = 'ranch_db'
 const collName = 'herdMembers'
+
 
 app.use(bodyParser.json())
 
