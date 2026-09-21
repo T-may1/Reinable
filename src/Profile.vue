@@ -170,6 +170,13 @@ input {
     border-radius: 5px;
     background-color: rgb(245, 243, 243);
     border: none;
+    -webkit-box-shadow: 5px 4px 8px -2px rgba(32,36,42,0.36);
+    -moz-box-shadow: 5px 4px 8px -2px rgba(32,36,42,0.36);
+    box-shadow: 5px 4px 8px -2px rgba(32,36,42,0.36);
+}
+
+input:focus{
+    outline: none;
 }
 
 b {

@@ -3,13 +3,9 @@
 App description
 
 Reinable is a Vue.js app to manage and track and store information on individual horse profiles.
-
 Tech stack used:
-
 Vue.js in Frontend
-
 Node.js in backend
-
 MongoDB as database
 
 
@@ -30,10 +26,8 @@ app runs on port 3000
 
 Environment variables:
 
-DB_USER,
-
-DB_PASS,
-
+DB_USER
+DB_PASS
 DEV
 
 
