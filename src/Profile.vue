@@ -1,7 +1,7 @@
 <template>
-    <div class="profile-container" v-show="!isEditMode">
+    <div class="profile-container" v-if="loaded && !isEditMode">
         <div class="heading-container">
-            <h1>{{ horseName }}</h1>
+            <h1>{{ name }}</h1>
             <img :src="image">
         </div>
         <div class="info-container">
@@ -22,9 +22,9 @@
         </div>
     </div>
 
-    <div class="profile-container" v-show="isEditMode">
+    <div class="profile-container" v-if="loaded && isEditMode">
         <div class="heading-container">
-            <h1>{{horseProfile}}</h1>
+            <h1>{{ name }}</h1>
             <img :src="image">
         </div>
         <div class="info-container">
@@ -51,6 +51,7 @@
         </div>
     </div>
     
+    <p v-if="!loaded">Loading...</p>
 
 </template>
 
@@ -58,6 +59,12 @@
 import image from './heidi.png'
 export default {
     name: 'Profile',
+    props: {
+        id: {
+            type: String,
+            required: true
+        }
+    },
     data() {
         return{
             image: image,
@@ -66,24 +73,45 @@ export default {
             schooling:"",
             height: "",
             weight: "",
-            isEditMode: false
+            isEditMode: false,
+            loaded: false
         }
-       
     },
-    async created() {
-        const profileData = await this.fetchProfileData()
-        this.name = profileData.name
-        this.role = profileData.role
-        this.schooling = profileData.schooling
-        this.height = profileData.height
-        this.weight = profileData.weight
+    watch: {
+        // Re-fetch if the user navigates from /profile/heidi to /profile/shadow
+        id: {
+            immediate: true,
+            handler() {
+                this.loadProfile()
+            }
+        }
     },
     methods: {
+        
+        async loadProfile() {
+            console.log('Loading profile with id:', this.id)
+            if (!this.id) {
+                console.warn('Profile loaded without an id — check the route and props')
+                this.loaded = true
+                return
+            }
+            this.loaded = false
+            const data = await this.fetchProfileData(this.id)
+            this.name = data.name
+            this.role = data.role
+            this.schooling = data.schooling
+            this.height = data.height
+            this.weight = data.weight
+            this.image = data.image || image
+            this.loaded = true
+        },
+
         handleEditProfile() {
             this.isEditMode = true
             },
         async handleUpdateProfile() {
             const payload = {
+                id: this.id,
                 name: this.name,
                 role: this.role,
                 schooling: this.schooling,
@@ -95,12 +123,18 @@ export default {
             
             this.isEditMode = false
         },
-        async fetchProfileData() {
-            const res = await fetch('get-profile')
-            return await res.json()
+        async fetchProfileData(id) {
+            try {
+                const res = await fetch(`/get-profile?id=${encodeURIComponent(id)}`)
+                if (!res.ok) throw new Error(`HTTP ${res.status}`)
+                return await res.json()
+            } catch (err) {
+                console.error('Failed to fetch profile:', err)
+                return { name: '', role: '', schooling: '', height: '', weight: '' }
+            }
         },
         async updateProfileData(payload) {
-            const res = await fetch('update-profile', {
+            const res = await fetch('/update-profile', {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,16 +146,12 @@ export default {
         }
         
     },
-    props: {
-        horseName: String
-    }
-        
     
 }
 
 </script>
 
-<style>
+<style scoped>
 img {
     max-width: 350px;
     width: 100%;
@@ -199,11 +229,16 @@ span {
 button{
     background-color:rgb(32, 32, 32);
     color: rgb(93, 138, 83);
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
 }
 
 button:hover{
     cursor: pointer;
     transition: all .3s ease;
+    background-color:#ffffff;
+    color: rgb(32, 32, 32);
 }
 
 </style>
