@@ -17,7 +17,8 @@
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "start": "DEV=true node server.js",
-        "test": "jest"
+        "start": "node server.js",
+        "test": "jest",
+        "startd": "DEV=true node server.js"
     }
 }

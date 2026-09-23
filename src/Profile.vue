@@ -89,7 +89,7 @@ export default {
     methods: {
         
         async loadProfile() {
-            console.log('Loading profile with id:', this.id)
+            
             if (!this.id) {
                 console.warn('Profile loaded without an id — check the route and props')
                 this.loaded = true

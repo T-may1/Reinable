@@ -23,7 +23,13 @@ To run application:
 
     npm run start
 
+Alternatively run "startd" script when developing:
+
+    npm run startd
+
+
 app runs on port 3000
+
 
 
 # Database authentication:
@@ -36,8 +42,10 @@ DB_PASS,
 
 DEV
 
+# Profiles and routing feature branch
 
-
+Functionality for switching between pages now implemented.
+As well as accessing multiple profiles from their own endpoints
 
 
 
