@@ -1,62 +1,61 @@
 <template>
-    <div class="profile-container" v-if="loaded && !isEditMode">
-        <div class="heading-container">
-            <h1>{{ name }}</h1>
-            <img :src="image">
-        </div>
-        <div class="info-container">
-            <div>
-                <span>Name: </span> <b>{{ name }}</b>
-                <hr>
-                <span>Role: </span> <b>{{ role }}</b>
-                <hr>
-                <span>Schooling: </span> <b>{{ schooling }}</b>
-                <hr>
-                <span>Height: </span> <b>{{ height }}</b>
-                <hr>
-                <span>Weight: </span> <b>{{ weight }}</b>
-                <hr>
+    <div class="profile-page">
+        <p v-if="!loaded" class="loading">Loading...</p>
 
-                <button @click="handleEditProfile" id="edit-button">Edit</button>
+        <div v-else-if="!isEditMode" class="profile-container">
+            <div class="heading-container">
+                <h1>{{ name }}</h1>
+                <img :src="image">
+            </div>
+            <div class="info-container">
+                <div>
+                    <span>Name: </span> <b>{{ name }}</b>
+                    <hr>
+                    <span>Role: </span> <b>{{ role }}</b>
+                    <hr>
+                    <span>Schooling: </span> <b>{{ schooling }}</b>
+                    <hr>
+                    <span>Height: </span> <b>{{ height }}</b>
+                    <hr>
+                    <span>Weight: </span> <b>{{ weight }}</b>
+                    <hr>
+                    <button @click="handleEditProfile" id="edit-button">Edit</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-else class="profile-container">
+            <div class="heading-container">
+                <h1>{{ name }}</h1>
+                <img :src="image">
+            </div>
+            <div class="info-container">
+                <div>
+                    <span>Name: </span>
+                    <input v-model="name" type="text" />
+                    <hr>
+                    <span>Role: </span>
+                    <input v-model="role" type="text" />
+                    <hr>
+                    <span>Schooling: </span>
+                    <input v-model="schooling" type="text" />
+                    <hr>
+                    <span>Height: </span>
+                    <input v-model="height" type="text" />
+                    <hr>
+                    <span>Weight: </span>
+                    <input v-model="weight" type="text" />
+                    <hr>
+                    <button @click="handleUpdateProfile" id="update-button">Update</button>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="profile-container" v-if="loaded && isEditMode">
-        <div class="heading-container">
-            <h1>{{ name }}</h1>
-            <img :src="image">
-        </div>
-        <div class="info-container">
-            <div>
-                <span>Name: </span> 
-                <input id="input-name" v-model="name" type="text" />
-                <hr>
-                <span>Role: </span> 
-                <input id="input-role" v-model="role" type="text" />
-                <hr>
-                <span>Schooling: </span> 
-                <input id="input-schooling" v-model="schooling" type="text" />
-                <hr>
-                <span>Height: </span> 
-                <input id="input-height" v-model="height" type="text" />
-                <hr>
-                <span>Weight: </span> 
-                <input id="input-weight" v-model="weight" type="text" />
-                <hr>
-
-                <button @click="handleUpdateProfile" id="update-button">Update</button>
-
-            </div>
-        </div>
-    </div>
-    
-    <p v-if="!loaded">Loading...</p>
-
 </template>
 
 <script>
 import image from './heidi.png'
+
 export default {
     name: 'Profile',
     props: {
@@ -65,6 +64,7 @@ export default {
             required: true
         }
     },
+
     data() {
         return{
             image: image,
@@ -74,8 +74,17 @@ export default {
             height: "",
             weight: "",
             isEditMode: false,
-            loaded: false
+            loaded: false,
+            isMounted: false
         }
+    },
+
+    mounted() {
+    this.isMounted = true
+    },
+    
+    beforeUnmount() {
+        this.isMounted = false
     },
     watch: {
         // Re-fetch if the user navigates from /profile/heidi to /profile/shadow
@@ -97,6 +106,7 @@ export default {
             }
             this.loaded = false
             const data = await this.fetchProfileData(this.id)
+            if (!this.isMounted) return
             this.name = data.name
             this.role = data.role
             this.schooling = data.schooling

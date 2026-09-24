@@ -16,13 +16,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const horses = ref([])
+let isMounted = false
 
 onMounted(async () => {
+    isMounted = true
     const res = await fetch('/horses')
+    if (!isMounted) return
     horses.value = await res.json()
+})
+
+onBeforeUnmount(() => {
+    isMounted = false
 })
 </script>
 
