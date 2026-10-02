@@ -8,6 +8,7 @@ import ProfilesList from './ProfilesList.vue'
 const routes = [
   { path: '/', name: 'home', component: Home},
   { path: '/about', name: 'about', component: About},
+  { path: '/profile/new', name: 'new-profile', component: Profile },
   { path: '/profile/:id', name: 'profile', component: Profile, props: true },
   { path: '/profiles', name: 'profiles', component: ProfilesList }
 ]

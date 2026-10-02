@@ -2,54 +2,58 @@
     <div class="profile-page">
         <p v-if="!loaded" class="loading">Loading...</p>
 
-        <div v-else-if="!isEditMode" class="profile-container">
-            <div class="heading-container">
-                <h1>{{ name }}</h1>
-                <img :src="image">
-            </div>
-            <div class="info-container">
-                <div>
-                    <span>Name: </span> <b>{{ name }}</b>
-                    <hr>
-                    <span>Role: </span> <b>{{ role }}</b>
-                    <hr>
-                    <span>Schooling: </span> <b>{{ schooling }}</b>
-                    <hr>
-                    <span>Height: </span> <b>{{ height }}</b>
-                    <hr>
-                    <span>Weight: </span> <b>{{ weight }}</b>
-                    <hr>
-                    <button @click="handleEditProfile" id="edit-button">Edit</button>
+         <Transition v-else name="profile-fade" mode="out-in">
+            <div v-if="!isEditMode && !isNew" class="profile-container" key="view">
+                <div class="heading-container">
+                    <h1>{{ name }}</h1>
+                    <img :src="image">
+                </div>
+                <div class="info-container">
+                    <div>
+                        <span>Name: </span> <b>{{ name }}</b>
+                        <hr>
+                        <span>Role: </span> <b>{{ role }}</b>
+                        <hr>
+                        <span>Schooling: </span> <b>{{ schooling }}</b>
+                        <hr>
+                        <span>Height: </span> <b>{{ height }}</b>
+                        <hr>
+                        <span>Weight: </span> <b>{{ weight }}</b>
+                        <hr>
+                        <button @click="handleEditProfile" id="edit-button">Edit</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div v-else class="profile-container">
-            <div class="heading-container">
-                <h1>{{ name }}</h1>
-                <img :src="image">
-            </div>
-            <div class="info-container">
-                <div>
-                    <span>Name: </span>
-                    <input v-model="name" type="text" />
-                    <hr>
-                    <span>Role: </span>
-                    <input v-model="role" type="text" />
-                    <hr>
-                    <span>Schooling: </span>
-                    <input v-model="schooling" type="text" />
-                    <hr>
-                    <span>Height: </span>
-                    <input v-model="height" type="text" />
-                    <hr>
-                    <span>Weight: </span>
-                    <input v-model="weight" type="text" />
-                    <hr>
-                    <button @click="handleUpdateProfile" id="update-button">Update</button>
+            <div v-else class="profile-container" key="edit">
+                <div class="heading-container">
+                    <h1>{{ name || 'New Horse'  }}</h1>
+                    <img :src="image">
+                </div>
+                <div class="info-container">
+                    <div>
+                        <span>Name: </span>
+                        <input v-model="name" type="text" />
+                        <hr>
+                        <span>Role: </span>
+                        <input v-model="role" type="text" />
+                        <hr>
+                        <span>Schooling: </span>
+                        <input v-model="schooling" type="text" />
+                        <hr>
+                        <span>Height: </span>
+                        <input v-model="height" type="text" />
+                        <hr>
+                        <span>Weight: </span>
+                        <input v-model="weight" type="text" />
+                        <hr>
+                        <button v-if="isNew" @click="handleCreateProfile" id="create-button">Create</button>
+                        <button v-else @click="handleUpdateProfile" id="update-button">Update</button>
+                        <button v-if="isNew" @click="handleCancel" id="cancel-button">Cancel</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </Transition>
     </div>
 </template>
 
@@ -61,7 +65,7 @@ export default {
     props: {
         id: {
             type: String,
-            required: true
+            default: null
         }
     },
 
@@ -95,6 +99,11 @@ export default {
             }
         }
     },
+    computed: {
+        isNew() {
+            return !this.id
+        }
+    },
     methods: {
         
         async loadProfile() {
@@ -118,7 +127,12 @@ export default {
 
         handleEditProfile() {
             this.isEditMode = true
-            },
+        },
+
+        handleCreateProfile() {
+
+        },
+
         async handleUpdateProfile() {
             const payload = {
                 id: this.id,
@@ -153,6 +167,9 @@ export default {
                 body: JSON.stringify(payload)
             })
             return await res.json()
+        },
+        handleCancel(){
+            this.$router.push('/profiles')
         }
         
     },
@@ -235,6 +252,10 @@ span {
 #edit-button {
     margin-bottom: 20px;
 }
+#create-button {
+    margin-bottom: 20px;
+    margin-right: 10px;
+}
 
 button{
     background-color:rgb(32, 32, 32);
@@ -249,6 +270,19 @@ button:hover{
     transition: all .3s ease;
     background-color:#ffffff;
     color: rgb(32, 32, 32);
+}
+
+.profile-fade-enter-active {
+    transition: opacity 0.3s ease;
+}
+
+.profile-fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.profile-fade-enter-from,
+.profile-fade-leave-to {
+    opacity: 0;
 }
 
 </style>
