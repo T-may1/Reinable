@@ -49,3 +49,6 @@ As well as accessing multiple profiles from their own endpoints
 
 
 
+# Add new profile feature branch 
+
+Functionality for adding a new profile.
