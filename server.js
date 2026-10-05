@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require ('body-parser')
 const { MongoClient } = require('mongodb')
 const { isEmptyPayload, isInvalidHeight} = require('./validator')
+const {slugify, isInvalidSlug} = require('./slugify')
 
 const app = express()
 const dbAddress = '127.0.0.1:27017'
@@ -74,6 +75,53 @@ app.post('/update-profile', async function(req, res) {
             matched: result.matchedCount,
             modified: result.modifiedCount
         })
+    }catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Database error' })
+    }
+
+})
+
+app.post('/new-profile', async function(req, res) {
+    const payload = req.body
+
+    if (isEmptyPayload(payload) || isInvalidHeight(payload)) {
+        return res.status(400).json({ error: "Invalid payload. Couldn't create profile" })
+    }
+
+    const slug = slugify(payload.name)
+    if (isInvalidSlug(slug)) {
+        return res.status(400).json({ error: "Please enter a valid name" })
+    }
+
+    const profile = { id: slug, ...payload }
+
+    try {
+        const collection = client.db(dbName).collection(collName)
+        await collection.insertOne(profile)
+        return res.status(201).json(profile)
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({ error: 'This profile name already exists' })
+        }
+        console.error(err)
+        return res.status(500).json({ error: 'Database error' })
+    }
+})
+
+app.post('/delete-profile', async function(req, res) {
+    const payload = req.body
+
+    const { id } = payload
+    if (!id) return res.status(400).json({ error: 'Missing id in payload' })
+
+    try {
+        const collection = client.db(dbName).collection(collName)
+        const result = await collection.deleteOne({ id })
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Profile not found' })
+        }
+        return res.status(200).json({info: 'Profile deleted successfully'})
     }catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Database error' })

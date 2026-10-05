@@ -21,6 +21,7 @@
                         <span>Weight: </span> <b>{{ weight }}</b>
                         <hr>
                         <button @click="handleEditProfile" id="edit-button">Edit</button>
+                        <button @click="handleDeleteProfile" id="delete-button">Delete</button>
                     </div>
                 </div>
             </div>
@@ -109,7 +110,6 @@ export default {
         async loadProfile() {
             
             if (!this.id) {
-                console.warn('Profile loaded without an id — check the route and props')
                 this.loaded = true
                 return
             }
@@ -128,9 +128,33 @@ export default {
         handleEditProfile() {
             this.isEditMode = true
         },
+        async handleDeleteProfile() {
+            if (!confirm('Delete this horse? This cannot be undone.')) return
+            const resJson = await this.deleteProfileData(this.id)
+            if (resJson.error) {
+                console.error(resJson.error)
+                return {error: 'Delete Failed'}
+            }
+            this.$router.push('/profiles')
+            
 
-        handleCreateProfile() {
+        },
 
+        async handleCreateProfile() {
+            const payload = {
+                name: this.name,
+                role: this.role,
+                schooling: this.schooling,
+                height: this.height,
+                weight: this.weight
+            }
+            const resJson = await this.createNewProfile(payload)
+            if (resJson.error) {
+                console.error(resJson.error)
+                return
+            }
+            this.$router.push({ name: 'profile', params: { id: resJson.id } })
+            
         },
 
         async handleUpdateProfile() {
@@ -158,23 +182,62 @@ export default {
             }
         },
         async updateProfileData(payload) {
-            const res = await fetch('/update-profile', {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            return await res.json()
+            try {
+                const res = await fetch('/update-profile', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload) 
+                })
+                if (!res.ok) throw new Error(`HTTP ${res.status}`)
+                return await res.json()
+            }catch (err){
+                console.log('Failed to update Profile', err)
+                return
+            }
         },
+
+        async createNewProfile(payload) {
+            try { 
+                const res = await fetch('/new-profile', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                if (!res.ok) throw new Error(`HTTP ${res.status}`)
+                return await res.json()
+            } catch (err) {
+                console.log('Failed to create profile. Check valid name', err)
+                return { error: 'Create failed' }
+            }
+        },
+        async deleteProfileData(id) {
+            try {
+                const res = await fetch('/delete-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                })
+                if (!res.ok) throw new Error(`HTTP ${res.status}`)
+                return await res.json()
+            } catch (err) {
+                console.log('Failed to delete profile', err)
+                return { error: 'Delete failed' }
+            }
+        },
+
         handleCancel(){
             this.$router.push('/profiles')
         }
         
-    },
-    
+    }
 }
+    
 
 </script>
 
@@ -251,6 +314,7 @@ span {
 }
 #edit-button {
     margin-bottom: 20px;
+    margin-right: 10px;
 }
 #create-button {
     margin-bottom: 20px;
@@ -270,6 +334,12 @@ button:hover{
     transition: all .3s ease;
     background-color:#ffffff;
     color: rgb(32, 32, 32);
+}
+#delete-button:hover{
+    cursor: pointer;
+    transition: all .3s ease;
+    background-color:#ff0000;
+    color: rgb(255, 255, 255);
 }
 
 .profile-fade-enter-active {
