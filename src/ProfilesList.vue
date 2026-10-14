@@ -33,6 +33,10 @@ onMounted(async () => {
     const res = await fetch('/horses')
     if (!isMounted) return
     horses.value = await res.json()
+    if (res.error) {
+        showToast(res.error, 'error')
+        return
+    }
 })
 
 onBeforeUnmount(() => {

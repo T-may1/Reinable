@@ -1,8 +1,35 @@
 const express = require('express')
 const bodyParser = require ('body-parser')
 const { MongoClient } = require('mongodb')
-const { isEmptyPayload, isInvalidHeight} = require('./validator')
+const { isEmptyPayload, isInvalidHeight, isInvalidName, isInvalidWeight} = require('./validator')
 const {slugify, isInvalidSlug} = require('./slugify')
+const multer = require('multer')
+const path = require('path')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+        const ext = path.extname(file.originalname)
+        cb(null, file.fieldname + '-' + uniqueSuffix + ext)
+    }
+})
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: function (req, file, cb) {
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+        if (allowed.includes(file.mimetype)) {
+            cb(null, true)
+        } else {
+            cb(new Error('Only image files are allowed'))
+        }
+    }
+})
+
 
 const app = express()
 const dbAddress = '127.0.0.1:27017'
@@ -22,6 +49,8 @@ app.use(bodyParser.json())
 
 app.use('/', express.static(__dirname + '/dist'))
 
+app.use('/uploads', express.static('uploads'))
+
 app.get('/horses', async function (req, res) {
 
     try {
@@ -32,7 +61,7 @@ app.get('/horses', async function (req, res) {
         res.json(horses)
     } catch (err) {
         console.error(err)
-        res.status(500).json({ error: 'Failed to fetch horses' })
+        res.status(500).json({ error: 'Could not load horses' })
     }
 })
 
@@ -58,8 +87,19 @@ app.get('/get-profile', async function(req, res) {
 app.post('/update-profile', async function(req, res) {
     const payload = req.body
 
-    if (isEmptyPayload(payload) || isInvalidHeight(payload)) {
-        res.status(400).json({error: "Invalid payload.Couldn't update data"})
+    if (isEmptyPayload(payload)) {
+    return res.status(400).json({ error: "Payload is empty" });
+    }
+
+    if (isInvalidName(payload.name)) {
+        return res.status(400).json({ error: "Name must be 1-50 characters" });
+    }
+
+    if (isInvalidWeight(payload.weight)) {
+        return res.status(400).json({ error: "Weight must contain a number" });
+    }
+    if (isInvalidHeight(payload.height)) {
+        return res.status(400).json({ error: "Height must contain a number" });
     }
 
     const { id } = payload
@@ -85,9 +125,21 @@ app.post('/update-profile', async function(req, res) {
 app.post('/new-profile', async function(req, res) {
     const payload = req.body
 
-    if (isEmptyPayload(payload) || isInvalidHeight(payload)) {
-        return res.status(400).json({ error: "Invalid payload. Couldn't create profile" })
+    if (isEmptyPayload(payload)) {
+    return res.status(400).json({ error: "Payload is empty" });
     }
+
+    if (isInvalidName(payload.name)) {
+        return res.status(400).json({ error: "Name must be 1-50 characters" });
+    }
+
+    if (isInvalidWeight(payload.weight)) {
+        return res.status(400).json({ error: "Weight must contain a number" });
+    }
+    if (isInvalidHeight(payload.height)) {
+        return res.status(400).json({ error: "Height must contain a number" });
+    }
+    
 
     const slug = slugify(payload.name)
     if (isInvalidSlug(slug)) {
@@ -127,6 +179,16 @@ app.post('/delete-profile', async function(req, res) {
         res.status(500).json({ error: 'Database error' })
     }
 
+})
+
+app.post('/upload-image', upload.single('image'), function (req, res) {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' })
+    }
+
+    res.status(200).json({
+        imageUrl: '/uploads/' + req.file.filename
+    })
 })
 
 app.get('/{*splat}', function (req, res) {

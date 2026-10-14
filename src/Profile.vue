@@ -29,7 +29,15 @@
             <div v-else class="profile-container" key="edit">
                 <div class="heading-container">
                     <h1>{{ name || 'New Horse'  }}</h1>
-                    <img :src="image">
+                    <div class="image-wrapper">
+                        <Transition name="image-fade" mode="out-in">
+                            <img :src="image" :key="image" alt="Profile" />
+                        </Transition>
+                        <Transition name="image-fade">
+                            <div v-if="isUploading" class="upload-overlay">Uploading…</div>
+                        </Transition>
+                    </div>
+                    <input id="upload-input" type="file" accept="image/*" @change="handleFileChange" />
                 </div>
                 <div class="info-container">
                     <div>
@@ -55,11 +63,23 @@
                 </div>
             </div>
         </Transition>
+        
+
+        <ConfirmDialogue
+            v-if="showDeleteConfirm"
+            title="Delete this horse?"
+            message="This cannot be undone."
+            @confirm="confirmDelete"
+            @cancel="showDeleteConfirm = false"
+        />
+
     </div>
 </template>
 
 <script>
 import image from './heidi.png'
+import { showToast } from './toastStore'
+import ConfirmDialogue from './ConfirmDialogue.vue'
 
 export default {
     name: 'Profile',
@@ -69,7 +89,9 @@ export default {
             default: null
         }
     },
-
+    components: {
+        ConfirmDialogue
+    },
     data() {
         return{
             image: image,
@@ -80,7 +102,9 @@ export default {
             weight: "",
             isEditMode: false,
             loaded: false,
-            isMounted: false
+            isMounted: false,
+            showDeleteConfirm: false,
+            isUploading: false
         }
     },
 
@@ -106,16 +130,23 @@ export default {
         }
     },
     methods: {
-        
         async loadProfile() {
-            
             if (!this.id) {
                 this.loaded = true
                 return
             }
+
             this.loaded = false
             const data = await this.fetchProfileData(this.id)
+
             if (!this.isMounted) return
+
+            if (data.error) {
+                showToast(data.error, 'error')
+                this.loaded = true
+                return
+            }
+
             this.name = data.name
             this.role = data.role
             this.schooling = data.schooling
@@ -128,16 +159,41 @@ export default {
         handleEditProfile() {
             this.isEditMode = true
         },
-        async handleDeleteProfile() {
-            if (!confirm('Delete this horse? This cannot be undone.')) return
-            const resJson = await this.deleteProfileData(this.id)
-            if (resJson.error) {
-                console.error(resJson.error)
-                return {error: 'Delete Failed'}
-            }
-            this.$router.push('/profiles')
-            
 
+        handleDeleteProfile() {
+            this.showDeleteConfirm = true
+        },
+        
+        async handleFileChange(event) {
+            
+            const file = event.target.files[0]
+            if (!file) return
+            this.isUploading = true
+            const resJson = await this.uploadProfile(file)
+            this.isUploading = false
+
+            if (resJson.error) {
+                showToast(resJson.error, 'error')
+                return
+            }
+
+            this.image = resJson.imageUrl
+            showToast('Image uploaded — click Save to apply', 'info')
+    
+        },
+
+        async confirmDelete() {
+            this.showDeleteConfirm = false
+
+            const resJson = await this.deleteProfileData(this.id)
+
+            if (resJson.error) {
+                showToast(resJson.error, 'error')
+                return
+            }
+
+            showToast('Profile deleted', 'success')
+            this.$router.push('/profiles')
         },
 
         async handleCreateProfile() {
@@ -146,13 +202,15 @@ export default {
                 role: this.role,
                 schooling: this.schooling,
                 height: this.height,
-                weight: this.weight
+                weight: this.weight,
+                image: this.image
             }
             const resJson = await this.createNewProfile(payload)
             if (resJson.error) {
-                console.error(resJson.error)
+                showToast(resJson.error, 'error')
                 return
             }
+            showToast('Profile created!', 'success')
             this.$router.push({ name: 'profile', params: { id: resJson.id } })
             
         },
@@ -164,23 +222,37 @@ export default {
                 role: this.role,
                 schooling: this.schooling,
                 height: this.height,
-                weight: this.weight
+                weight: this.weight,
+                image: this.image
             }
             const resJson = await this.updateProfileData(payload)
-            console.log(resJson)
+            if (resJson.error) {
+                showToast(resJson.error, 'error')
+                return
+            }
+            showToast('Profile updated successfully!', 'success')
             
             this.isEditMode = false
         },
+
         async fetchProfileData(id) {
             try {
                 const res = await fetch(`/get-profile?id=${encodeURIComponent(id)}`)
-                if (!res.ok) throw new Error(`HTTP ${res.status}`)
-                return await res.json()
+                const data = await res.json()
+
+                if (res.status === 404) {
+                    return { error: 'Profile not found' }
+                }
+                if (!res.ok) {
+                    return { error: data.error || `Server error (${res.status})` }
+                }
+                return data
             } catch (err) {
                 console.error('Failed to fetch profile:', err)
-                return { name: '', role: '', schooling: '', height: '', weight: '' }
+                return { error: 'Could not reach server' }
             }
         },
+
         async updateProfileData(payload) {
             try {
                 const res = await fetch('/update-profile', {
@@ -191,29 +263,41 @@ export default {
                     },
                     body: JSON.stringify(payload) 
                 })
-                if (!res.ok) throw new Error(`HTTP ${res.status}`)
-                return await res.json()
-            }catch (err){
-                console.log('Failed to update Profile', err)
-                return
+
+                const data = await res.json()
+
+                if (!res.ok) {
+                    return { error: data.error || `Server error (${res.status})` }
+                }
+
+                return data
+            } catch (err) {
+                console.log('Failed to update profile', err)
+                return { error: 'Could not reach server. Please try again.' }
             }
         },
 
         async createNewProfile(payload) {
-            try { 
+            try {
                 const res = await fetch('/new-profile', {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 })
-                if (!res.ok) throw new Error(`HTTP ${res.status}`)
-                return await res.json()
+
+                const data = await res.json()
+
+                if (!res.ok) {
+                    return { error: data.error || `Server error (${res.status})` }
+                }
+
+                return data
             } catch (err) {
-                console.log('Failed to create profile. Check valid name', err)
-                return { error: 'Create failed' }
+                console.log('Failed to create profile', err)
+                return { error: 'Could not reach server. Please try again.' }
             }
         },
         async deleteProfileData(id) {
@@ -223,11 +307,35 @@ export default {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id })
                 })
-                if (!res.ok) throw new Error(`HTTP ${res.status}`)
-                return await res.json()
+
+                const data = await res.json()
+
+                if (!res.ok) {
+                    return { error: data.error || `Server error (${res.status})` }
+                }
+
+                return data
             } catch (err) {
                 console.log('Failed to delete profile', err)
-                return { error: 'Delete failed' }
+                return { error: 'Could not reach server. Please try again.' }
+            }
+        },
+
+        async uploadProfile(file) {
+            const formData = new FormData()
+            formData.append('image', file)
+
+            try {
+                const res = await fetch('/upload-image', {
+                    method: 'POST',
+                    body: formData
+                })
+                const data = await res.json()
+                if (!res.ok) return { error: data.error || `Server error (${res.status})` }
+                return data
+            } catch (err) {
+            console.log('Failed to upload image', err)
+            return { error: 'Could not upload image. Please try again.' }
             }
         },
 
@@ -243,12 +351,66 @@ export default {
 
 <style scoped>
 img {
-    max-width: 350px;
-    width: 100%;
-    object-fit: contain;
-    display:block;
+    max-width: 330px;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
     margin: auto;
     margin-bottom: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid white;
+}
+
+.image-wrapper:hover img {
+    box-shadow: 0 0 0 4px rgba(93, 138, 83, 0.3);
+}
+
+.image-wrapper {
+    position: relative;
+    width: 200px;
+    margin: auto;
+    margin-bottom: 40px;
+}
+
+.image-wrapper img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    transition: box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+
+.image-fade-enter-active {
+    transition: opacity 0.3s ease;
+}
+
+.image-fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.image-fade-enter-from,
+.image-fade-leave-to {
+    opacity: 0;
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
 }
 
 .profile-container {
@@ -293,6 +455,12 @@ input {
     -webkit-box-shadow: 5px 4px 8px -2px rgba(32,36,42,0.36);
     -moz-box-shadow: 5px 4px 8px -2px rgba(32,36,42,0.36);
     box-shadow: 5px 4px 8px -2px rgba(32,36,42,0.36);
+}
+
+#upload-input{
+    margin-bottom: 20px;
+    background-color: transparent;
+    box-shadow: none;
 }
 
 input:focus{
@@ -354,5 +522,6 @@ button:hover{
 .profile-fade-leave-to {
     opacity: 0;
 }
+
 
 </style>

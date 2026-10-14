@@ -5,6 +5,7 @@
         "core-js": "3.48.0",
         "express": "5.2.1",
         "mongodb": "7.5.0",
+        "multer": "^2.4.0",
         "vue": "3.5.33",
         "vue-router": "4.6.4"
     },

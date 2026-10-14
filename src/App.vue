@@ -11,6 +11,7 @@
                 <component :is="Component" :key="route.path" />
             </Transition>
         </router-view>
+        <Toast/>
     </div>
 
 </template>
@@ -18,12 +19,18 @@
 <script>
 import Header from './Header.vue'
 import NavBar from './NavBar.vue'
+import Toast from './Toast.vue'
+import { showToast } from './toastStore.js';
 
 export default {
     name: 'App',
     components: {
         Header,
-        NavBar
+        NavBar,
+        Toast
+    },
+    methods: {
+        showToast
     }
 
 }
